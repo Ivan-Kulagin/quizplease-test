@@ -20,6 +20,8 @@ const onCreateReply = (event) => {
 
 const onDeleteComment = (event) => {
     emit('comment:delete', { originalEvent: event, id: props.id })
+    replyVisible.value = false
+    editVisible.value = false
 }
 
 const replyVisible = ref(false)
