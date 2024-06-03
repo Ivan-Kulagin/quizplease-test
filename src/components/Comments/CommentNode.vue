@@ -87,8 +87,10 @@ const counterStyle = computed(() => {
     <div class="comment__container">
       <div class="comment__meta">
         <Avatar :label="author.name[0]" style="background-color: #dee9fc; color: #1a2551" size="normal" shape="circle" />
-        <a :href="`#/user/${author.profileId}`">{{ author.name }}</a>
-        <span>{{ datetime }}</span>
+        <div class="flex-wrap">
+          <a :href="`#/user/${author.profileId}`">{{ author.name }}</a>
+          <span>{{ datetime }}</span>
+        </div>
       </div>
       <div class="comment__content">
         <div v-if="deleted" class="comment__text comment__text--deleted">Комментарий удалён</div>
@@ -194,5 +196,11 @@ const counterStyle = computed(() => {
     display: none
   }
   font-weight: 400;
+}
+.flex-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  row-gap: 4px;
+  column-gap: 8px;
 }
 </style>
