@@ -56,32 +56,52 @@ const onDownvote = (event) => {
 const isCurrent = computed(() => {
     return props.author.profileId === props.currentUser.profileId
 })
+
+const likeActive = computed(() => {
+    return props.likes.includes(props.currentUser.profileId)
+})
+
+const dislikeActive = computed(() => {
+    return props.dislikes.includes(props.currentUser.profileId)
+})
+
+const voteDiff = computed(() => {
+    return props.likes.length - props.dislikes.length
+})
+
+const counterStyle = computed(() => {
+    if (voteDiff.value > 0) {
+        return { color: 'darkseagreen' }
+    } else if (voteDiff.value < 0) {
+        return { color: 'indianred' }
+    }
+})
 </script>
 
 <template>
 <div class="comment">
   <div class="comment__line-wrapper">
-    <div class="comment__line">
-      <div class="comment__line--base" />
-      <div class="comment__line--border" />
-    </div>
-    <div class="comment__content">
+    <div class="comment__line" />
+    <div class="comment__container">
       <div class="comment__meta">
+        <Avatar :label="author.name[0]" style="background-color: #dee9fc; color: #1a2551" size="normal" shape="circle" />
         <a :href="`#/user/${author.profileId}`">{{ author.name }}</a>
         <span>{{ datetime }}</span>
       </div>
-      <div v-if="deleted" class="comment__deleted">Комментарий удалён</div>
-      <div v-else class="comment__text">{{ text }}</div>
-      <div class="comment__actions">
-        <button :class="{'like--active': likes.includes(currentUser.profileId)}" :disabled="deleted" @click="onUpvote">+</button>
-        {{ likes.length - dislikes.length }}
-        <button :class="{'dislike--active': dislikes.includes(currentUser.profileId)}" :disabled="deleted" @click="onDownvote">-</button>
-        <button v-if="!deleted" @click="toggleReply">ответить</button>
-        <button v-if="isCurrent && !deleted" @click="toggleEdit">редактировать</button>
-        <button v-if="isCurrent && !deleted" @click="onDeleteComment">удалить</button>
+      <div class="comment__content">
+        <div v-if="deleted" class="comment__text comment__text--deleted">Комментарий удалён</div>
+        <div v-else class="comment__text">{{ deleted ? 'Комментарий удалён' : text }}</div>
+        <div class="comment__actions">
+          <Button text :icon="likeActive ? 'pi pi-thumbs-up-fill' : 'pi pi-thumbs-up'" :class="{'like--active': likeActive}" :disabled="deleted" @click="onUpvote" />
+          <div class="comment__likes-counter" :style="counterStyle">{{ voteDiff }}</div>
+          <Button text :icon="dislikeActive ? 'pi pi-thumbs-down-fill' : 'pi pi-thumbs-down'" :class="{'dislike--active': dislikeActive}" :disabled="deleted" @click="onDownvote" />
+          <Button text v-if="!deleted" icon="pi pi-reply" size="small" label="Ответить" @click="toggleReply" />
+          <Button text v-if="!deleted && isCurrent" icon="pi pi-pencil" size="small" @click="toggleEdit" />
+          <Button text v-if="!deleted && isCurrent" icon="pi pi-trash" size="small" @click="onDeleteComment" />
+        </div>
+        <AddComment v-if="editVisible" v-model="commentText" @save="onEditComment" @cancel="onCancelEdit" :parent-id="null" />
+        <AddComment v-if="replyVisible" v-model="replyText" @save="onCreateReply" @cancel="onCancelReply" :parent-id="id" />
       </div>
-      <AddComment v-if="editVisible" v-model="commentText" @save="onEditComment" @cancel="onCancelEdit" :parent-id="null" />
-      <AddComment v-if="replyVisible" v-model="replyText" @save="onCreateReply" @cancel="onCancelReply" :parent-id="id" />
       <template v-for="reply in replies" :key="reply.id">
         <CommentNode
           :current-user="currentUser"
@@ -113,40 +133,53 @@ const isCurrent = computed(() => {
   gap: 8px;
 }
 .comment__line {
-  &--base {
-    height: 100%;
-    width: 2px;
-    background-color: black;
-  }
-  &--border {
-    width: 6px;
-    height: 2px;
-    background-color: black;
-  }
+  width: 6px;
+  border-bottom: 2px solid #CCC;
+  border-left: 2px solid #CCC;
+  border-bottom-left-radius: 6px;
 }
 .comment__content {
-
+  padding-left: 32px;
 }
-.comment__avatar {
-
+.comment__container {
+  margin-bottom: 8px;
+}
+.comment__likes-counter {
+  width: 20px;
+  text-align: center;
 }
 .comment__meta {
   display: flex;
+  align-items: center;
   gap: 8px;
 }
 .comment__text {
+  padding: 8px 0 8px 8px;
   white-space: pre-wrap;
 }
 .comment__actions {
-
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
-.comment__deleted {
+.comment__text--deleted {
   color: #AAA;
 }
 .like--active {
-  background-color: darkseagreen;
+  color: darkseagreen !important;
+  background-color: white;
 }
 .dislike--active {
-  background-color: indianred;
+  color: indianred !important;
+  background-color: white;
+}
+.p-button {
+  color: black;
+  &:focus {
+    box-shadow: none;
+  }
+}
+::v-deep(.p-button-label) {
+  font-weight: 400;
 }
 </style>

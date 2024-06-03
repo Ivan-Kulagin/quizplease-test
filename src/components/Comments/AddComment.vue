@@ -29,11 +29,19 @@ const onChangeInput = (event) => {
 </script>
 
 <template>
-  <textarea @input="onChangeInput" :value="modelValue" />
-  <button @click="onCancel">Отменить</button>
-  <button @click="onSave">Сохранить</button>
+  <div class="add-button">
+    <Textarea @input="onChangeInput" :value="modelValue" placeholder="Напишите комментарий" />
+    <Button v-if="modelValue.length" size="small" @click="onCancel">Отменить</Button>
+    <Button v-if="modelValue.length" size="small" @click="onSave">Сохранить</Button>
+  </div>
 </template>
 
 <style scoped>
-
+.add-button {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 4px;
+    margin-bottom: 12px;
+}
 </style>
