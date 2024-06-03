@@ -95,9 +95,11 @@ const counterStyle = computed(() => {
           <Button text :icon="likeActive ? 'pi pi-thumbs-up-fill' : 'pi pi-thumbs-up'" :class="{'like--active': likeActive}" :disabled="deleted" @click="onUpvote" />
           <div class="comment__likes-counter" :style="counterStyle">{{ voteDiff }}</div>
           <Button text :icon="dislikeActive ? 'pi pi-thumbs-down-fill' : 'pi pi-thumbs-down'" :class="{'dislike--active': dislikeActive}" :disabled="deleted" @click="onDownvote" />
-          <Button text v-if="!deleted" icon="pi pi-reply" size="small" label="Ответить" @click="toggleReply" />
-          <Button text v-if="!deleted && isCurrent" icon="pi pi-pencil" size="small" @click="toggleEdit" />
-          <Button text v-if="!deleted && isCurrent" icon="pi pi-trash" size="small" @click="onDeleteComment" />
+          <div class="comment__actions__additional">
+            <Button text v-if="!deleted" icon="pi pi-reply" size="small" label="Ответить" @click="toggleReply" />
+            <Button text v-if="!deleted && isCurrent" icon="pi pi-pencil" size="small" @click="toggleEdit" />
+            <Button text v-if="!deleted && isCurrent" icon="pi pi-trash" size="small" @click="onDeleteComment" />
+          </div>
         </div>
         <AddComment v-if="editVisible" v-model="commentText" @save="onEditComment" @cancel="onCancelEdit" :parent-id="null" />
         <AddComment v-if="replyVisible" v-model="replyText" @save="onCreateReply" @cancel="onCancelReply" :parent-id="id" />
@@ -159,6 +161,12 @@ const counterStyle = computed(() => {
 }
 .comment__actions {
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+.comment__actions__additional {
+  display: flex;
   align-items: center;
   gap: 4px;
 }
@@ -180,6 +188,9 @@ const counterStyle = computed(() => {
   }
 }
 ::v-deep(.p-button-label) {
+  @media(max-width: '400px') {
+    display: none
+  }
   font-weight: 400;
 }
 </style>
